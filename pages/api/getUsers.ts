@@ -1,20 +1,24 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import Airtable from 'airtable';
+import fs from 'fs/promises';
+import path from 'path';
 
-const base = new Airtable({apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN}).base(process.env.AIRTABLE_BASE_ID!);
-const table = base(process.env.AIRTABLE_TABLE_NAME!);
+const dataFilePath = path.join(process.cwd(), 'data', 'entries.json');
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const records = await table.select().all();
-      const users = records.map(record => ({
-        id: record.id,
-        name: record.get('name'),
-        email: record.get('email'),
-        image: record.get('image'),
-        createdAt: record.get('createdAt')
+      const data = await fs.readFile(dataFilePath, 'utf8');
+      const entries = JSON.parse(data);
+      
+      // Extract unique users from entries
+      const uniqueEmployees = Array.from(new Set(entries.map((entry: any) => entry.employee)));
+      const users = uniqueEmployees.map(employee => ({
+        name: employee,
+        email: `${employee.toLowerCase()}@example.com`, // Generate a dummy email
+        image: `https://api.dicebear.com/6.x/initials/svg?seed=${employee}`, // Generate an avatar
+        createdAt: new Date().toISOString() // Use current date as creation date
       }));
+
       res.status(200).json(users);
     } catch (error: unknown) {
       console.error('Error fetching users:', error);
