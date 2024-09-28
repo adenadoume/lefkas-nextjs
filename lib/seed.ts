@@ -1,7 +1,4 @@
-import fs from 'fs/promises';
-import path from 'path';
-
-const dataFilePath = path.join(process.cwd(), 'data', 'entries.json');
+import { kv } from '@vercel/kv';
 
 export async function seed() {
   try {
@@ -11,7 +8,7 @@ export async function seed() {
       { id: '3', month: 'February', day: 1, building: 'OIK90', employee: 'Ferman', description: 'Repairs', cost: 200 },
     ];
 
-    await fs.writeFile(dataFilePath, JSON.stringify(sampleEntries, null, 2));
+    await kv.set('entries', sampleEntries);
 
     console.log(`Seeded ${sampleEntries.length} entries`);
 

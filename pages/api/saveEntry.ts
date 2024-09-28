@@ -1,8 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs/promises';
-import path from 'path';
-
-const dataFilePath = path.join(process.cwd(), 'data', 'entries.json');
+import { kv } from '@vercel/kv';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('API route called', req.method, req.body);
@@ -10,16 +7,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { month, day, building, employee, description, cost } = req.body;
 
     try {
-      // Check if the file exists, if not create it with an empty array
-      try {
-        await fs.access(dataFilePath);
-      } catch {
-        await fs.writeFile(dataFilePath, '[]');
-      }
-
-      const data = await fs.readFile(dataFilePath, 'utf8');
-      const entries = JSON.parse(data);
-      
       const newEntry = {
         id: Date.now().toString(),
         month,
@@ -30,9 +17,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         cost
       };
 
+      // Get existing entries
+      let entries = await kv.get<any[]>('entries') || [];
+      
+      // Add new entry
       entries.push(newEntry);
 
-      await fs.writeFile(dataFilePath, JSON.stringify(entries, null, 2));
+      // Save updated entries
+      await kv.set('entries', entries);
 
       console.log('Entry saved successfully:', newEntry);
       res.status(200).json({ message: 'Entry saved successfully', data: newEntry });
