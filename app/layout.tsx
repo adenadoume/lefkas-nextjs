@@ -1,18 +1,12 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 
-export const metadata = {
-  metadataBase: new URL('https://postgres-starter.vercel.app'),
-  title: 'Vercel Postgres Demo',
-  description:
-    'A simple Next.js app with Vercel Postgres as the database',
-}
+const inter = Inter({ subsets: ['latin'] })
 
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-})
+export const metadata = {
+  title: 'Building Management Spreadsheet',
+  description: 'A spreadsheet app for managing building expenses',
+}
 
 export default function RootLayout({
   children,
@@ -21,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }

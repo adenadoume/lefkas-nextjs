@@ -51,7 +51,10 @@ export default function SpreadsheetApp() {
       if (!newData[month][day]) newData[month][day] = {}
       if (!newData[month][day][building]) newData[month][day][building] = []
       if (!newData[month][day][building][index]) newData[month][day][building][index] = { employee: '', description: '', cost: 0 }
-      newData[month][day][building][index][field] = field === 'cost' ? parseFloat(value) : value
+      newData[month][day][building][index] = {
+        ...newData[month][day][building][index],
+        [field]: field === 'cost' ? parseFloat(value) : value
+      }
       return newData
     })
   }
@@ -122,7 +125,7 @@ export default function SpreadsheetApp() {
                         <Select
                           key={index}
                           value={entry.employee}
-                          onValueChange={(value) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
+                          onValueChange={(value: string) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select employee" />
@@ -140,7 +143,7 @@ export default function SpreadsheetApp() {
                         <Input
                           key={index}
                           value={entry.description}
-                          onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
                           placeholder="Description"
                         />
                       ))}
@@ -151,7 +154,7 @@ export default function SpreadsheetApp() {
                           key={index}
                           type="number"
                           value={entry.cost.toString()}
-                          onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
                           placeholder="Cost"
                         />
                       ))}
