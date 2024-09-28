@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -41,7 +41,7 @@ export default function SpreadsheetApp() {
     return date.toLocaleDateString('en-US', { weekday: 'short' })
   }
 
-  const handleEntryChange = (month: string, day: number, building: string, index: number, field: keyof Entry, value: string) => {
+  const handleEntryChange = useCallback(async (month: string, day: number, building: string, index: number, field: keyof Entry, value: string) => {
     setData((prevData: { [month: string]: MonthData }) => {
       const newData = { ...prevData }
       if (!newData[month]) newData[month] = {}
@@ -54,9 +54,33 @@ export default function SpreadsheetApp() {
       }
       return newData
     })
-  }
 
-  const addEntry = (month: string, day: number, building: string) => {
+    // Save to database
+    const entry = data[month]?.[day]?.[building]?.[index] || { employee: '', description: '', cost: 0 }
+    try {
+      const response = await fetch('/api/saveEntry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          month,
+          day,
+          building,
+          ...entry,
+          [field]: field === 'cost' ? parseFloat(value) : value
+        }),
+      })
+      if (!response.ok) {
+        throw new Error('Failed to save entry')
+      }
+    } catch (error) {
+      console.error('Error saving entry:', error)
+      // You might want to show an error message to the user here
+    }
+  }, [data])
+
+  const addEntry = useCallback(async (month: string, day: number, building: string) => {
     setData((prevData: { [month: string]: MonthData }) => {
       const newData = { ...prevData }
       if (!newData[month]) newData[month] = {}
@@ -65,7 +89,31 @@ export default function SpreadsheetApp() {
       newData[month][day][building].push({ employee: '', description: '', cost: 0 })
       return newData
     })
-  }
+
+    // Save to database
+    try {
+      const response = await fetch('/api/saveEntry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          month,
+          day,
+          building,
+          employee: '',
+          description: '',
+          cost: 0
+        }),
+      })
+      if (!response.ok) {
+        throw new Error('Failed to save entry')
+      }
+    } catch (error) {
+      console.error('Error saving entry:', error)
+      // You might want to show an error message to the user here
+    }
+  }, [])
 
   const calculateDailyTotal = (month: string, day: number, building: string): number => {
     return data[month]?.[day]?.[building]?.reduce((sum: number, entry: Entry) => sum + (entry.cost || 0), 0) || 0
