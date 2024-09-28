@@ -4,6 +4,13 @@ import Image from 'next/image'
 import RefreshButton from './refresh-button'
 import { seed } from '@/lib/seed'
 
+interface User {
+  name: string;
+  email: string;
+  image: string;
+  createdAt: Date;
+}
+
 export default async function Table() {
   let data
   let startTime = Date.now()
@@ -24,42 +31,48 @@ export default async function Table() {
     }
   }
 
-  const { rows: users } = data
+  const { rows: users } = data as { rows: User[] }
   const duration = Date.now() - startTime
 
   return (
-    <div className="bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-xl mx-auto w-full">
-      <div className="flex justify-between items-center mb-4">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold">Recent Users</h2>
-          <p className="text-sm text-gray-500">
+    <div className="bg-white shadow-xl rounded-lg overflow-hidden max-w-6xl mx-auto w-full">
+      <div className="flex justify-between items-center p-4 bg-blue-600 text-white">
+        <div>
+          <h2 className="text-2xl font-bold">Recent Users</h2>
+          <p className="text-sm opacity-80">
             Fetched {users.length} users in {duration}ms
           </p>
         </div>
         <RefreshButton />
       </div>
-      <div className="divide-y divide-gray-900/5">
-        {users.map((user) => (
-          <div
-            key={user.name}
-            className="flex items-center justify-between py-3"
-          >
-            <div className="flex items-center space-x-4">
-              <Image
-                src={user.image}
-                alt={user.name}
-                width={48}
-                height={48}
-                className="rounded-full ring-1 ring-gray-900/5"
-              />
-              <div className="space-y-1">
-                <p className="font-medium leading-none">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">{timeAgo(user.createdAt)}</p>
-          </div>
-        ))}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="py-3 px-4 text-left font-semibold text-gray-600">User</th>
+              <th className="py-3 px-4 text-left font-semibold text-gray-600">Email</th>
+              <th className="py-3 px-4 text-left font-semibold text-gray-600">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user: User) => (
+              <tr key={user.name} className="border-b border-gray-200 hover:bg-gray-50">
+                <td className="py-3 px-4 flex items-center space-x-3">
+                  <Image
+                    src={user.image}
+                    alt={user.name}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                  <span className="font-medium">{user.name}</span>
+                </td>
+                <td className="py-3 px-4">{user.email}</td>
+                <td className="py-3 px-4 text-gray-500">{timeAgo(user.createdAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
