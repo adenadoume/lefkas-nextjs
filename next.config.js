@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ["images.ctfassets.net"],
-  },
-};
+  reactStrictMode: true,
+  // Add any other Next.js config options here
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
