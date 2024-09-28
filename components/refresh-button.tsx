@@ -2,16 +2,17 @@
 
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
+import { Button } from "@/components/ui/button"
 
 export default function RefreshButton() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   return (
-    <button
-      className={`${
-        isPending ? 'cursor-not-allowed text-gray-400' : ''
-      } text-sm text-gray-500 hover:text-gray-900`}
+    <Button
+      className={`spreadsheet-button ${
+        isPending ? 'cursor-not-allowed opacity-50' : ''
+      }`}
       disabled={isPending}
       onClick={() => {
         startTransition(() => {
@@ -20,6 +21,6 @@ export default function RefreshButton() {
       }}
     >
       {isPending ? 'Refreshing...' : 'Refresh'}
-    </button>
+    </Button>
   )
 }

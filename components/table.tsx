@@ -42,24 +42,24 @@ export default async function Table() {
   const duration = Date.now() - startTime
 
   return (
-    <div className="bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-xl mx-auto w-full">
-      <div className="flex justify-between items-center mb-4">
+    <div className="spreadsheet-container">
+      <div className="spreadsheet-header flex justify-between items-center">
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold">Recent Users</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-semibold text-foreground">Recent Users</h2>
+          <p className="text-sm text-muted-foreground">
             Fetched {users.length} users in {duration}ms
           </p>
         </div>
         <div className="space-x-2">
-          <Button variant="outline" className="bg-blue-500 text-white hover:bg-blue-600">Add User</Button>
+          <Button variant="outline" className="spreadsheet-button">Add User</Button>
           <RefreshButton />
         </div>
       </div>
-      <div className="divide-y divide-gray-900/5">
+      <div className="spreadsheet-body divide-y divide-border">
         {users.map((user) => (
           <div
             key={user.name}
-            className="flex items-center justify-between py-3"
+            className="spreadsheet-row flex items-center justify-between py-3"
           >
             <div className="flex items-center space-x-4">
               <Image
@@ -67,14 +67,14 @@ export default async function Table() {
                 alt={user.name}
                 width={48}
                 height={48}
-                className="rounded-full ring-1 ring-gray-900/5"
+                className="rounded-full ring-1 ring-border"
               />
               <div className="space-y-1">
-                <p className="font-medium leading-none">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="font-medium leading-none text-foreground">{user.name}</p>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
               </div>
             </div>
-            <p className="text-sm text-gray-500">{timeAgo(user.createdAt)}</p>
+            <p className="text-sm text-muted-foreground">{timeAgo(user.createdAt)}</p>
           </div>
         ))}
       </div>
