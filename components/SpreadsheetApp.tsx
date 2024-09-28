@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -25,12 +25,8 @@ type MonthData = {
   [day: number]: DayData
 }
 
-type Data = {
-  [month: string]: MonthData
-}
-
 export default function SpreadsheetApp() {
-  const [data, setData] = useState<Data>({})
+  const [data, setData] = useState<{ [month: string]: MonthData }>({})
   const [selectedMonth, setSelectedMonth] = useState(months[new Date().getMonth()])
   const [selectedBuilding, setSelectedBuilding] = useState(buildings[0])
 
@@ -45,7 +41,7 @@ export default function SpreadsheetApp() {
   }
 
   const handleEntryChange = (month: string, day: number, building: string, index: number, field: keyof Entry, value: string) => {
-    setData((prevData: Data) => {
+    setData((prevData: { [month: string]: MonthData }) => {
       const newData = { ...prevData }
       if (!newData[month]) newData[month] = {}
       if (!newData[month][day]) newData[month][day] = {}
@@ -60,7 +56,7 @@ export default function SpreadsheetApp() {
   }
 
   const addEntry = (month: string, day: number, building: string) => {
-    setData((prevData: Data) => {
+    setData((prevData: { [month: string]: MonthData }) => {
       const newData = { ...prevData }
       if (!newData[month]) newData[month] = {}
       if (!newData[month][day]) newData[month][day] = {}
@@ -83,17 +79,17 @@ export default function SpreadsheetApp() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Building Management Spreadsheet</h1>
-      <Tabs value={selectedMonth} onValueChange={setSelectedMonth}>
+    <div className="spreadsheet-container">
+      <h1 className="text-2xl font-bold mb-4 text-foreground">Building Management Spreadsheet</h1>
+      <Tabs value={selectedMonth} onValueChange={setSelectedMonth} className="month-tabs">
         <TabsList>
           {months.map(month => (
-            <TabsTrigger key={month} value={month}>{month}</TabsTrigger>
+            <TabsTrigger key={month} value={month} className="month-tab">{month}</TabsTrigger>
           ))}
         </TabsList>
         {months.map(month => (
           <TabsContent key={month} value={month}>
-            <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
+            <Select value={selectedBuilding} onValueChange={setSelectedBuilding} className="building-select">
               <SelectTrigger>
                 <SelectValue placeholder="Select building" />
               </SelectTrigger>
@@ -106,26 +102,27 @@ export default function SpreadsheetApp() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Day</TableHead>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Cost (€)</TableHead>
-                  <TableHead>Daily Total (€)</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-foreground">Date</TableHead>
+                  <TableHead className="text-foreground">Day</TableHead>
+                  <TableHead className="text-foreground">Employee</TableHead>
+                  <TableHead className="text-foreground">Description</TableHead>
+                  <TableHead className="text-foreground">Cost (€)</TableHead>
+                  <TableHead className="text-foreground">Daily Total (€)</TableHead>
+                  <TableHead className="text-foreground">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {Array.from({ length: getDaysInMonth(month) }, (_, i) => i + 1).map(day => (
-                  <TableRow key={day}>
+                  <TableRow key={day} className="spreadsheet-row">
                     <TableCell>{day}</TableCell>
                     <TableCell>{getDayName(month, day)}</TableCell>
                     <TableCell>
-                      {data[month]?.[day]?.[selectedBuilding]?.map((entry: Entry, index: number) => (
+                      {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
                         <Select
                           key={index}
                           value={entry.employee}
-                          onValueChange={(value: string) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
+                          onValueChange={(value) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
+                          className="spreadsheet-select"
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select employee" />
@@ -139,23 +136,25 @@ export default function SpreadsheetApp() {
                       ))}
                     </TableCell>
                     <TableCell>
-                      {data[month]?.[day]?.[selectedBuilding]?.map((entry: Entry, index: number) => (
+                      {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
                         <Input
                           key={index}
                           value={entry.description}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
+                          onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
                           placeholder="Description"
+                          className="spreadsheet-input"
                         />
                       ))}
                     </TableCell>
                     <TableCell>
-                      {data[month]?.[day]?.[selectedBuilding]?.map((entry: Entry, index: number) => (
+                      {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
                         <Input
                           key={index}
                           type="number"
-                          value={entry.cost.toString()}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
+                          value={entry.cost}
+                          onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
                           placeholder="Cost"
+                          className="spreadsheet-input"
                         />
                       ))}
                     </TableCell>
@@ -163,7 +162,7 @@ export default function SpreadsheetApp() {
                       {calculateDailyTotal(month, day, selectedBuilding).toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      <Button onClick={() => addEntry(month, day, selectedBuilding)}>
+                      <Button onClick={() => addEntry(month, day, selectedBuilding)} className="spreadsheet-button">
                         Add Entry
                       </Button>
                     </TableCell>
@@ -171,7 +170,7 @@ export default function SpreadsheetApp() {
                 ))}
               </TableBody>
             </Table>
-            <div className="mt-4">
+            <div className="total-display">
               <strong>Monthly Total for {selectedBuilding}: €{calculateMonthlyTotal(month, selectedBuilding).toFixed(2)}</strong>
             </div>
           </TabsContent>
