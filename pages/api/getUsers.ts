@@ -4,15 +4,20 @@ import path from 'path';
 
 const dataFilePath = path.join(process.cwd(), 'data', 'entries.json');
 
+interface Entry {
+  employee: string;
+  // Add other properties if needed
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
       const data = await fs.readFile(dataFilePath, 'utf8');
-      const entries = JSON.parse(data);
+      const entries: Entry[] = JSON.parse(data);
       
       // Extract unique users from entries
-      const uniqueEmployees = Array.from(new Set(entries.map((entry: any) => entry.employee)));
-      const users = uniqueEmployees.map(employee => ({
+      const uniqueEmployees = Array.from(new Set(entries.map((entry: Entry) => entry.employee)));
+      const users = uniqueEmployees.map((employee: string) => ({
         name: employee,
         email: `${employee.toLowerCase()}@example.com`, // Generate a dummy email
         image: `https://api.dicebear.com/6.x/initials/svg?seed=${employee}`, // Generate an avatar
