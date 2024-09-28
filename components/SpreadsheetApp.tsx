@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 const buildings = ['OIK50', 'OIK60', 'OIK90']
 const employees = ['Elina', 'Alex', 'Ferman', 'Cleaning']
@@ -89,16 +90,18 @@ export default function SpreadsheetApp() {
         </TabsList>
         {months.map(month => (
           <TabsContent key={month} value={month}>
-            <Select value={selectedBuilding} onValueChange={setSelectedBuilding} className="building-select">
-              <SelectTrigger>
-                <SelectValue placeholder="Select building" />
-              </SelectTrigger>
-              <SelectContent>
-                {buildings.map(building => (
-                  <SelectItem key={building} value={building}>{building}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="building-select">
+              <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select building" />
+                </SelectTrigger>
+                <SelectContent>
+                  {buildings.map(building => (
+                    <SelectItem key={building} value={building}>{building}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -118,21 +121,21 @@ export default function SpreadsheetApp() {
                     <TableCell>{getDayName(month, day)}</TableCell>
                     <TableCell>
                       {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
-                        <Select
-                          key={index}
-                          value={entry.employee}
-                          onValueChange={(value) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
-                          className="spreadsheet-select"
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select employee" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {employees.map(emp => (
-                              <SelectItem key={emp} value={emp}>{emp}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div key={index} className="spreadsheet-select">
+                          <Select
+                            value={entry.employee}
+                            onValueChange={(value) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select employee" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {employees.map(emp => (
+                                <SelectItem key={emp} value={emp}>{emp}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       ))}
                     </TableCell>
                     <TableCell>
