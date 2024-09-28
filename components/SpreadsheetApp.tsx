@@ -112,7 +112,6 @@ export default function SpreadsheetApp() {
 
     const entry = data[month]?.[day]?.[building]?.[index] || { id: Date.now().toString(), employee: '', description: '', cost: 0 }
     const entryData = {
-      id: entry.id,
       month,
       day,
       building,
