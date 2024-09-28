@@ -1,37 +1,22 @@
-import Airtable from 'airtable';
+import fs from 'fs/promises';
+import path from 'path';
 
-const base = new Airtable({apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN}).base(process.env.AIRTABLE_BASE_ID!);
-const table = base(process.env.AIRTABLE_TABLE_NAME!);
+const dataFilePath = path.join(process.cwd(), 'data', 'entries.json');
 
 export async function seed() {
   try {
     const sampleEntries = [
-      { month: 'January', day: 1, building: 'OIK50', employee: 'Elina', description: 'Cleaning', cost: 100 },
-      { month: 'January', day: 2, building: 'OIK60', employee: 'Alex', description: 'Maintenance', cost: 150 },
-      { month: 'February', day: 1, building: 'OIK90', employee: 'Ferman', description: 'Repairs', cost: 200 },
+      { id: '1', month: 'January', day: 1, building: 'OIK50', employee: 'Elina', description: 'Cleaning', cost: 100 },
+      { id: '2', month: 'January', day: 2, building: 'OIK60', employee: 'Alex', description: 'Maintenance', cost: 150 },
+      { id: '3', month: 'February', day: 1, building: 'OIK90', employee: 'Ferman', description: 'Repairs', cost: 200 },
     ];
 
-    const createdRecords = await Promise.all(
-      sampleEntries.map(entry => 
-        table.create([
-          {
-            fields: {
-              month: entry.month,
-              day: entry.day,
-              building: entry.building,
-              employee: entry.employee,
-              description: entry.description,
-              cost: entry.cost
-            }
-          }
-        ])
-      )
-    );
+    await fs.writeFile(dataFilePath, JSON.stringify(sampleEntries, null, 2));
 
-    console.log(`Seeded ${createdRecords.length} entries`);
+    console.log(`Seeded ${sampleEntries.length} entries`);
 
     return {
-      createdRecords
+      createdRecords: sampleEntries
     };
   } catch (error) {
     console.error('Error seeding data:', error);

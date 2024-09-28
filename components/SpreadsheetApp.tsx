@@ -45,7 +45,7 @@ export default function SpreadsheetApp() {
         })
         const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(`Failed to save entry: ${responseData.error}`)
+          throw new Error(`Failed to save entry: ${JSON.stringify(responseData)}`)
         }
         console.log('Entry saved successfully')
         setSaveStatus('saved')
@@ -167,9 +167,24 @@ export default function SpreadsheetApp() {
     return total
   }
 
+  const handleSeed = async () => {
+    try {
+      const response = await fetch('/api/seed', { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('Seeding failed');
+      }
+      const result = await response.json();
+      console.log('Seeding successful:', result);
+      // Optionally, refresh your data here
+    } catch (error) {
+      console.error('Error seeding data:', error);
+    }
+  };
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Building Management Spreadsheet</h1>
+      <Button onClick={handleSeed} className="mb-4">Seed Data</Button>
       {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
       {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
       {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}

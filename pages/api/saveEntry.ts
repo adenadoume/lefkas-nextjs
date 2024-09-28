@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import Airtable from 'airtable';
+import fs from 'fs/promises';
+import path from 'path';
 
-// Configure Airtable
-const base = new Airtable({apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN}).base(process.env.AIRTABLE_BASE_ID!);
-const table = base(process.env.AIRTABLE_TABLE_NAME!);
+const dataFilePath = path.join(process.cwd(), 'data', 'entries.json');
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('API route called', req.method, req.body);
@@ -11,25 +10,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { month, day, building, employee, description, cost } = req.body;
 
     try {
-      console.log('Attempting to insert:', { month, day, building, employee, description, cost });
-      const result = await table.create([
-        {
-          fields: {
-            month,
-            day,
-            building,
-            employee,
-            description,
-            cost
-          }
-        }
-      ]);
-      console.log('Entry saved successfully, returned data:', result);
-      res.status(200).json({ message: 'Entry saved successfully', data: result });
+      const data = await fs.readFile(dataFilePath, 'utf8');
+      const entries = JSON.parse(data);
+      
+      const newEntry = {
+        id: Date.now().toString(),
+        month,
+        day,
+        building,
+        employee,
+        description,
+        cost
+      };
+
+      entries.push(newEntry);
+
+      await fs.writeFile(dataFilePath, JSON.stringify(entries, null, 2));
+
+      console.log('Entry saved successfully:', newEntry);
+      res.status(200).json({ message: 'Entry saved successfully', data: newEntry });
     } catch (error: unknown) {
       console.error('Error saving entry:', error);
       if (error instanceof Error) {
-        res.status(500).json({ error: 'Failed to save entry', details: error.message });
+        res.status(500).json({ error: 'Failed to save entry', details: error.message, stack: error.stack });
       } else {
         res.status(500).json({ error: 'Failed to save entry', details: 'An unknown error occurred' });
       }

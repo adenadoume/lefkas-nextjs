@@ -1,25 +1,18 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import Airtable from 'airtable';
+import fs from 'fs/promises';
+import path from 'path';
 
-const base = new Airtable({apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN}).base(process.env.AIRTABLE_BASE_ID!);
-const table = base(process.env.AIRTABLE_TABLE_NAME!);
+const dataFilePath = path.join(process.cwd(), 'data', 'entries.json');
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const records = await table.select().all();
-      const data = records.map(record => ({
-        id: record.id,
-        ...record.fields
-      }));
-      res.status(200).json(data);
+      const data = await fs.readFile(dataFilePath, 'utf8');
+      const entries = JSON.parse(data);
+      res.status(200).json(entries);
     } catch (error: unknown) {
       console.error('Error fetching entries:', error);
-      if (error instanceof Error) {
-        res.status(500).json({ error: 'Failed to fetch entries', details: error.message });
-      } else {
-        res.status(500).json({ error: 'Failed to fetch entries', details: 'An unknown error occurred' });
-      }
+      res.status(500).json({ error: 'Failed to fetch entries' });
     }
   } else {
     res.setHeader('Allow', ['GET']);
