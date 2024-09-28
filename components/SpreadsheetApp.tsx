@@ -80,15 +80,15 @@ export default function SpreadsheetApp() {
   }
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">Building Management Spreadsheet</h1>
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Building Management Spreadsheet</h1>
       <Tabs value={selectedMonth} onValueChange={setSelectedMonth} className="mb-6">
-        <TabsList className="flex space-x-2 mb-4">
+        <TabsList className="flex flex-wrap gap-2 mb-4">
           {months.map(month => (
             <TabsTrigger 
               key={month} 
               value={month} 
-              className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-t-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {month}
             </TabsTrigger>
@@ -98,92 +98,94 @@ export default function SpreadsheetApp() {
           <TabsContent key={month} value={month}>
             <div className="mb-4">
               <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
-                <SelectTrigger className="w-full p-2 border border-gray-300 rounded">
+                <SelectTrigger className="w-full p-2 border border-gray-300 rounded bg-white">
                   <SelectValue placeholder="Select building" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white z-10">
                   {buildings.map(building => (
                     <SelectItem key={building} value={building}>{building}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-gray-800">Date</TableHead>
-                  <TableHead className="text-gray-800">Day</TableHead>
-                  <TableHead className="text-gray-800">Employee</TableHead>
-                  <TableHead className="text-gray-800">Description</TableHead>
-                  <TableHead className="text-gray-800">Cost (€)</TableHead>
-                  <TableHead className="text-gray-800">Daily Total (€)</TableHead>
-                  <TableHead className="text-gray-800">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Array.from({ length: getDaysInMonth(month) }, (_, i) => i + 1).map(day => (
-                  <TableRow key={day} className="hover:bg-gray-50 transition-colors duration-150 ease-in-out">
-                    <TableCell>{day}</TableCell>
-                    <TableCell>{getDayName(month, day)}</TableCell>
-                    <TableCell>
-                      {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
-                        <div key={index} className="mb-2">
-                          <Select
-                            value={entry.employee}
-                            onValueChange={(value) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
-                          >
-                            <SelectTrigger className="w-full p-1 border border-gray-300 rounded">
-                              <SelectValue placeholder="Select employee" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {employees.map(emp => (
-                                <SelectItem key={emp} value={emp}>{emp}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      ))}
-                    </TableCell>
-                    <TableCell>
-                      {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
-                        <Input
-                          key={index}
-                          value={entry.description}
-                          onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
-                          placeholder="Description"
-                          className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-                        />
-                      ))}
-                    </TableCell>
-                    <TableCell>
-                      {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
-                        <Input
-                          key={index}
-                          type="number"
-                          value={entry.cost}
-                          onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
-                          placeholder="Cost"
-                          className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-                        />
-                      ))}
-                    </TableCell>
-                    <TableCell>
-                      {calculateDailyTotal(month, day, selectedBuilding).toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        onClick={() => addEntry(month, day, selectedBuilding)} 
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-150 ease-in-out"
-                      >
-                        Add Entry
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-gray-800">Date</TableHead>
+                    <TableHead className="text-gray-800">Day</TableHead>
+                    <TableHead className="text-gray-800">Employee</TableHead>
+                    <TableHead className="text-gray-800">Description</TableHead>
+                    <TableHead className="text-gray-800">Cost (€)</TableHead>
+                    <TableHead className="text-gray-800">Daily Total (€)</TableHead>
+                    <TableHead className="text-gray-800">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className="mt-6 text-right text-xl font-bold">
-              <strong>Monthly Total for {selectedBuilding}: €{calculateMonthlyTotal(month, selectedBuilding).toFixed(2)}</strong>
+                </TableHeader>
+                <TableBody>
+                  {Array.from({ length: getDaysInMonth(month) }, (_, i) => i + 1).map(day => (
+                    <TableRow key={day} className="hover:bg-gray-50 transition-colors duration-150 ease-in-out">
+                      <TableCell>{day}</TableCell>
+                      <TableCell>{getDayName(month, day)}</TableCell>
+                      <TableCell>
+                        {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
+                          <div key={index} className="mb-2">
+                            <Select
+                              value={entry.employee}
+                              onValueChange={(value) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
+                            >
+                              <SelectTrigger className="w-full p-1 border border-gray-300 rounded bg-white">
+                                <SelectValue placeholder="Select employee" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-white z-10">
+                                {employees.map(emp => (
+                                  <SelectItem key={emp} value={emp}>{emp}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ))}
+                      </TableCell>
+                      <TableCell>
+                        {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
+                          <Input
+                            key={index}
+                            value={entry.description}
+                            onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
+                            placeholder="Description"
+                            className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                          />
+                        ))}
+                      </TableCell>
+                      <TableCell>
+                        {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
+                          <Input
+                            key={index}
+                            type="number"
+                            value={entry.cost}
+                            onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
+                            placeholder="Cost"
+                            className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                          />
+                        ))}
+                      </TableCell>
+                      <TableCell>
+                        {calculateDailyTotal(month, day, selectedBuilding).toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          onClick={() => addEntry(month, day, selectedBuilding)} 
+                          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-150 ease-in-out text-sm"
+                        >
+                          Add Entry
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="mt-6 bg-gray-100 p-4 rounded-lg">
+              <strong className="text-xl">Monthly Total for {selectedBuilding}: €{calculateMonthlyTotal(month, selectedBuilding).toFixed(2)}</strong>
             </div>
           </TabsContent>
         ))}
