@@ -56,7 +56,7 @@ export default async function Table() {
         </div>
       </div>
       <div className="spreadsheet-body divide-y divide-border">
-        {users.map((user) => (
+        {users.map((user: User) => (
           <div
             key={user.name}
             className="spreadsheet-row flex items-center justify-between py-3"

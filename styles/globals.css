@@ -76,57 +76,59 @@
 }
 
 /* Custom styles for the spreadsheet */
-.spreadsheet-container {
-  @apply bg-white shadow-lg rounded-lg overflow-hidden;
-}
+@layer components {
+  .spreadsheet-container {
+    @apply bg-white shadow-lg rounded-lg overflow-hidden;
+  }
 
-.spreadsheet-header {
-  @apply bg-gray-100 p-4 border-b border-gray-200;
-}
+  .spreadsheet-header {
+    @apply bg-gray-100 p-4 border-b border-gray-200;
+  }
 
-.spreadsheet-body {
-  @apply p-4;
-}
+  .spreadsheet-body {
+    @apply p-4;
+  }
 
-.spreadsheet-row {
-  @apply hover:bg-gray-50 transition-colors duration-150 ease-in-out;
-}
+  .spreadsheet-row {
+    @apply hover:bg-gray-50 transition-colors duration-150 ease-in-out;
+  }
 
-.spreadsheet-cell {
-  @apply p-2 border-b border-gray-200;
-}
+  .spreadsheet-cell {
+    @apply p-2 border-b border-gray-200;
+  }
 
-.spreadsheet-input {
-  @apply w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
-}
+  .spreadsheet-input {
+    @apply w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
 
-.spreadsheet-select {
-  @apply w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
-}
+  .spreadsheet-select {
+    @apply w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
 
-.spreadsheet-button {
-  @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-150 ease-in-out;
-}
+  .spreadsheet-button {
+    @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-150 ease-in-out;
+  }
 
-/* Additional custom styles */
-.month-tabs {
-  @apply mb-6;
-}
+  /* Additional custom styles */
+  .month-tabs {
+    @apply mb-6;
+  }
 
-.month-tab {
-  @apply px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-t-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500;
-}
+  .month-tab {
+    @apply px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-t-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
 
-.month-tab[aria-selected="true"] {
-  @apply bg-white text-blue-600 border-t border-l border-r border-gray-200;
-}
+  .month-tab[aria-selected="true"] {
+    @apply bg-white text-blue-600 border-t border-l border-r border-gray-200;
+  }
 
-.building-select {
-  @apply mb-4;
-}
+  .building-select {
+    @apply mb-4;
+  }
 
-.total-display {
-  @apply mt-6 text-right text-xl font-bold;
+  .total-display {
+    @apply mt-6 text-right text-xl font-bold;
+  }
 }
 
 /* Responsive adjustments */
