@@ -7,12 +7,14 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { debounce } from 'lodash'
+import { Trash2 } from 'lucide-react'
 
 const buildings = ['OIK50', 'OIK60', 'OIK90']
 const employees = ['Elina', 'Alex', 'Ferman', 'Cleaning']
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 type Entry = {
+  id: string
   employee: string
   description: string
   cost: number
@@ -70,6 +72,7 @@ export default function SpreadsheetApp() {
           if (!processedData[entry.month][entry.day]) processedData[entry.month][entry.day] = {}
           if (!processedData[entry.month][entry.day][entry.building]) processedData[entry.month][entry.day][entry.building] = []
           processedData[entry.month][entry.day][entry.building].push({
+            id: entry.id,
             employee: entry.employee,
             description: entry.description,
             cost: entry.cost
@@ -99,7 +102,7 @@ export default function SpreadsheetApp() {
       if (!newData[month]) newData[month] = {}
       if (!newData[month][day]) newData[month][day] = {}
       if (!newData[month][day][building]) newData[month][day][building] = []
-      if (!newData[month][day][building][index]) newData[month][day][building][index] = { employee: '', description: '', cost: 0 }
+      if (!newData[month][day][building][index]) newData[month][day][building][index] = { id: Date.now().toString(), employee: '', description: '', cost: 0 }
       newData[month][day][building][index] = {
         ...newData[month][day][building][index],
         [field]: field === 'cost' ? (value === '' ? 0 : Math.round(parseFloat(value))) : value
@@ -107,8 +110,9 @@ export default function SpreadsheetApp() {
       return newData
     })
 
-    const entry = data[month]?.[day]?.[building]?.[index] || { employee: '', description: '', cost: 0 }
+    const entry = data[month]?.[day]?.[building]?.[index] || { id: Date.now().toString(), employee: '', description: '', cost: 0 }
     const entryData = {
+      id: entry.id,
       month,
       day,
       building,
@@ -125,7 +129,7 @@ export default function SpreadsheetApp() {
       if (!newData[month]) newData[month] = {}
       if (!newData[month][day]) newData[month][day] = {}
       if (!newData[month][day][building]) newData[month][day][building] = []
-      newData[month][day][building].push({ employee: '', description: '', cost: 0 })
+      newData[month][day][building].push({ id: Date.now().toString(), employee: '', description: '', cost: 0 })
       return newData
     })
 
@@ -137,6 +141,7 @@ export default function SpreadsheetApp() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          id: Date.now().toString(),
           month,
           day,
           building,
@@ -180,6 +185,27 @@ export default function SpreadsheetApp() {
       console.error('Error seeding data:', error);
     }
   };
+
+  const deleteEntry = useCallback(async (month: string, day: number, building: string, index: number) => {
+    try {
+      const entryId = data[month]?.[day]?.[building]?.[index]?.id
+      if (!entryId) return
+
+      const response = await fetch(`/api/deleteEntry?id=${entryId}`, { method: 'DELETE' })
+      if (!response.ok) throw new Error('Failed to delete entry')
+
+      setData((prevData) => {
+        const newData = { ...prevData }
+        newData[month][day][building].splice(index, 1)
+        if (newData[month][day][building].length === 0) delete newData[month][day][building]
+        if (Object.keys(newData[month][day]).length === 0) delete newData[month][day]
+        if (Object.keys(newData[month]).length === 0) delete newData[month]
+        return newData
+      })
+    } catch (error) {
+      console.error('Error deleting entry:', error)
+    }
+  }, [data])
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto">
@@ -263,13 +289,22 @@ export default function SpreadsheetApp() {
                       </TableCell>
                       <TableCell>
                         {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
-                          <Input
-                            key={index}
-                            type="number"
-                            value={entry.cost === 0 ? '' : entry.cost}
-                            onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
-                            className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-                          />
+                          <div key={index} className="flex items-center mb-2">
+                            <Input
+                              type="number"
+                              value={entry.cost === 0 ? '' : entry.cost}
+                              onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
+                              className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                            />
+                            <Button
+                              onClick={() => deleteEntry(month, day, selectedBuilding, index)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
                         ))}
                       </TableCell>
                       <TableCell>
