@@ -1,1 +1,15 @@
- 
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "installCommand": "npx pnpm@7 install --frozen-lockfile --network-timeout 100000",
+        "buildCommand": "npx pnpm@7 run build"
+      }
+    }
+  ],
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1"
+  }
+}
