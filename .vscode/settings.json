@@ -1,4 +1,16 @@
 {
   "typescript.tsdk": "node_modules/.pnpm/typescript@5.0.4/node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.retool_types/**": true,
+    "**/*tsconfig.json": true,
+    ".cache": true,
+    "retool.config.json": true
+  }
 }
