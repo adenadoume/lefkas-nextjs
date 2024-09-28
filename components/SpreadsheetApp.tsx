@@ -47,7 +47,7 @@ export default function SpreadsheetApp() {
         if (!response.ok) {
           throw new Error(`Failed to save entry: ${JSON.stringify(responseData)}`)
         }
-        console.log('Entry saved successfully')
+        console.log('Entry saved successfully:', responseData)
         setSaveStatus('saved')
       } catch (error) {
         console.error('Error saving entry:', error)
