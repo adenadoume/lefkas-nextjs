@@ -4,8 +4,8 @@
       "src": "package.json",
       "use": "@vercel/next",
       "config": {
-        "installCommand": "npx pnpm@7 install --frozen-lockfile --network-timeout 100000",
-        "buildCommand": "npx pnpm@7 run build"
+        "installCommand": "npm install -g pnpm@7 && pnpm install",
+        "buildCommand": "pnpm run build"
       }
     }
   ],
