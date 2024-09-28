@@ -80,19 +80,25 @@ export default function SpreadsheetApp() {
   }
 
   return (
-    <div className="spreadsheet-container">
-      <h1 className="text-2xl font-bold mb-4 text-foreground">Building Management Spreadsheet</h1>
-      <Tabs value={selectedMonth} onValueChange={setSelectedMonth} className="month-tabs">
-        <TabsList>
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">Building Management Spreadsheet</h1>
+      <Tabs value={selectedMonth} onValueChange={setSelectedMonth} className="mb-6">
+        <TabsList className="flex space-x-2 mb-4">
           {months.map(month => (
-            <TabsTrigger key={month} value={month} className="month-tab">{month}</TabsTrigger>
+            <TabsTrigger 
+              key={month} 
+              value={month} 
+              className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-t-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {month}
+            </TabsTrigger>
           ))}
         </TabsList>
         {months.map(month => (
           <TabsContent key={month} value={month}>
-            <div className="building-select">
+            <div className="mb-4">
               <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full p-2 border border-gray-300 rounded">
                   <SelectValue placeholder="Select building" />
                 </SelectTrigger>
                 <SelectContent>
@@ -105,28 +111,28 @@ export default function SpreadsheetApp() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-foreground">Date</TableHead>
-                  <TableHead className="text-foreground">Day</TableHead>
-                  <TableHead className="text-foreground">Employee</TableHead>
-                  <TableHead className="text-foreground">Description</TableHead>
-                  <TableHead className="text-foreground">Cost (€)</TableHead>
-                  <TableHead className="text-foreground">Daily Total (€)</TableHead>
-                  <TableHead className="text-foreground">Actions</TableHead>
+                  <TableHead className="text-gray-800">Date</TableHead>
+                  <TableHead className="text-gray-800">Day</TableHead>
+                  <TableHead className="text-gray-800">Employee</TableHead>
+                  <TableHead className="text-gray-800">Description</TableHead>
+                  <TableHead className="text-gray-800">Cost (€)</TableHead>
+                  <TableHead className="text-gray-800">Daily Total (€)</TableHead>
+                  <TableHead className="text-gray-800">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {Array.from({ length: getDaysInMonth(month) }, (_, i) => i + 1).map(day => (
-                  <TableRow key={day} className="spreadsheet-row">
+                  <TableRow key={day} className="hover:bg-gray-50 transition-colors duration-150 ease-in-out">
                     <TableCell>{day}</TableCell>
                     <TableCell>{getDayName(month, day)}</TableCell>
                     <TableCell>
                       {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
-                        <div key={index} className="spreadsheet-select">
+                        <div key={index} className="mb-2">
                           <Select
                             value={entry.employee}
                             onValueChange={(value) => handleEntryChange(month, day, selectedBuilding, index, 'employee', value)}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full p-1 border border-gray-300 rounded">
                               <SelectValue placeholder="Select employee" />
                             </SelectTrigger>
                             <SelectContent>
@@ -145,7 +151,7 @@ export default function SpreadsheetApp() {
                           value={entry.description}
                           onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
                           placeholder="Description"
-                          className="spreadsheet-input"
+                          className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                         />
                       ))}
                     </TableCell>
@@ -157,7 +163,7 @@ export default function SpreadsheetApp() {
                           value={entry.cost}
                           onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
                           placeholder="Cost"
-                          className="spreadsheet-input"
+                          className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                         />
                       ))}
                     </TableCell>
@@ -165,7 +171,10 @@ export default function SpreadsheetApp() {
                       {calculateDailyTotal(month, day, selectedBuilding).toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      <Button onClick={() => addEntry(month, day, selectedBuilding)} className="spreadsheet-button">
+                      <Button 
+                        onClick={() => addEntry(month, day, selectedBuilding)} 
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-150 ease-in-out"
+                      >
                         Add Entry
                       </Button>
                     </TableCell>
@@ -173,7 +182,7 @@ export default function SpreadsheetApp() {
                 ))}
               </TableBody>
             </Table>
-            <div className="total-display">
+            <div className="mt-6 text-right text-xl font-bold">
               <strong>Monthly Total for {selectedBuilding}: €{calculateMonthlyTotal(month, selectedBuilding).toFixed(2)}</strong>
             </div>
           </TabsContent>
