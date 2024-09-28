@@ -1,9 +1,8 @@
-import { sql } from '@vercel/postgres'
 import { timeAgo } from '@/lib/utils'
 import Image from 'next/image'
 import RefreshButton from './refresh-button'
-import { seed } from '@/lib/seed'
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from 'react'
 
 // Define the User type
 interface User {
@@ -13,33 +12,36 @@ interface User {
   createdAt: Date;
 }
 
-export default async function Table() {
-  let data
-  let startTime = Date.now()
+export default function Table() {
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  try {
-    data = await sql`SELECT * FROM users`
-  } catch (e: any) {
-    if (e.message.includes('relation "users" does not exist')) {
-      console.log(
-        'Table does not exist, creating and seeding it with dummy data now...'
-      )
-      // Table is not created yet
-      await seed()
-      startTime = Date.now()
-      data = await sql`SELECT * FROM users`
-    } else {
-      throw e
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('/api/getUsers')
+        if (!response.ok) {
+          throw new Error('Failed to fetch users')
+        }
+        const data = await response.json()
+        setUsers(data.map((user: any) => ({
+          ...user,
+          createdAt: new Date(user.createdAt)
+        })))
+      } catch (err) {
+        setError('Failed to load users')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  const users = data.rows.map((row: any): User => ({
-    name: row.name,
-    email: row.email,
-    image: row.image,
-    createdAt: new Date(row.createdAt)
-  }));
-  const duration = Date.now() - startTime
+    fetchUsers()
+  }, [])
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
 
   return (
     <div className="spreadsheet-container">
@@ -47,7 +49,7 @@ export default async function Table() {
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-foreground">Recent Users</h2>
           <p className="text-sm text-muted-foreground">
-            Fetched {users.length} users in {duration}ms
+            Fetched {users.length} users
           </p>
         </div>
         <div className="space-x-2">

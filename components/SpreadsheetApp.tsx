@@ -102,7 +102,7 @@ export default function SpreadsheetApp() {
       if (!newData[month][day][building][index]) newData[month][day][building][index] = { employee: '', description: '', cost: 0 }
       newData[month][day][building][index] = {
         ...newData[month][day][building][index],
-        [field]: field === 'cost' ? parseFloat(value) : value
+        [field]: field === 'cost' ? (value === '' ? 0 : Math.round(parseFloat(value))) : value
       }
       return newData
     })
@@ -113,7 +113,7 @@ export default function SpreadsheetApp() {
       day,
       building,
       ...entry,
-      [field]: field === 'cost' ? parseFloat(value) : value
+      [field]: field === 'cost' ? (value === '' ? 0 : Math.round(parseFloat(value))) : value
     }
 
     debouncedSave(entryData)
@@ -242,7 +242,6 @@ export default function SpreadsheetApp() {
                             key={index}
                             value={entry.description}
                             onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'description', e.target.value)}
-                            placeholder="Description"
                             className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                           />
                         ))}
@@ -252,15 +251,14 @@ export default function SpreadsheetApp() {
                           <Input
                             key={index}
                             type="number"
-                            value={entry.cost}
+                            value={entry.cost === 0 ? '' : entry.cost}
                             onChange={(e) => handleEntryChange(month, day, selectedBuilding, index, 'cost', e.target.value)}
-                            placeholder="Cost"
                             className="w-full p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                           />
                         ))}
                       </TableCell>
                       <TableCell>
-                        {calculateDailyTotal(month, day, selectedBuilding).toFixed(2)}
+                        {calculateDailyTotal(month, day, selectedBuilding).toFixed(0)}
                       </TableCell>
                       <TableCell>
                         <Button 
