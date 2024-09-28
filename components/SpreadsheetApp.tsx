@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { debounce } from 'lodash'
 
 const buildings = ['OIK50', 'OIK60', 'OIK90']
 const employees = ['Elina', 'Alex', 'Ferman', 'Cleaning']
@@ -30,6 +30,58 @@ export default function SpreadsheetApp() {
   const [data, setData] = useState<{ [month: string]: MonthData }>({})
   const [selectedMonth, setSelectedMonth] = useState(months[new Date().getMonth()])
   const [selectedBuilding, setSelectedBuilding] = useState(buildings[0])
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+
+  const debouncedSave = useRef(
+    debounce(async (entryData) => {
+      try {
+        setSaveStatus('saving')
+        const response = await fetch('/api/saveEntry', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(entryData),
+        })
+        const responseData = await response.json()
+        if (!response.ok) {
+          throw new Error(`Failed to save entry: ${responseData.error}`)
+        }
+        console.log('Entry saved successfully')
+        setSaveStatus('saved')
+      } catch (error) {
+        console.error('Error saving entry:', error)
+        setSaveStatus('error')
+      }
+    }, 500)
+  ).current
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/getEntries')
+        if (!response.ok) {
+          throw new Error('Failed to fetch entries')
+        }
+        const entries = await response.json()
+        const processedData: { [month: string]: MonthData } = {}
+        entries.forEach((entry: any) => {
+          if (!processedData[entry.month]) processedData[entry.month] = {}
+          if (!processedData[entry.month][entry.day]) processedData[entry.month][entry.day] = {}
+          if (!processedData[entry.month][entry.day][entry.building]) processedData[entry.month][entry.day][entry.building] = []
+          processedData[entry.month][entry.day][entry.building].push({
+            employee: entry.employee,
+            description: entry.description,
+            cost: entry.cost
+          })
+        })
+        setData(processedData)
+      } catch (error) {
+        console.error('Error fetching entries:', error)
+      }
+    }
+    fetchData()
+  }, [])
 
   const getDaysInMonth = (month: string): number => {
     const date = new Date(new Date().getFullYear(), months.indexOf(month) + 1, 0)
@@ -41,7 +93,7 @@ export default function SpreadsheetApp() {
     return date.toLocaleDateString('en-US', { weekday: 'short' })
   }
 
-  const handleEntryChange = useCallback(async (month: string, day: number, building: string, index: number, field: keyof Entry, value: string) => {
+  const handleEntryChange = useCallback((month: string, day: number, building: string, index: number, field: keyof Entry, value: string) => {
     setData((prevData: { [month: string]: MonthData }) => {
       const newData = { ...prevData }
       if (!newData[month]) newData[month] = {}
@@ -55,34 +107,17 @@ export default function SpreadsheetApp() {
       return newData
     })
 
-    // Save to database
     const entry = data[month]?.[day]?.[building]?.[index] || { employee: '', description: '', cost: 0 }
-    try {
-      console.log('Sending entry to API:', { month, day, building, ...entry, [field]: field === 'cost' ? parseFloat(value) : value });
-      const response = await fetch('/api/saveEntry', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          month,
-          day,
-          building,
-          ...entry,
-          [field]: field === 'cost' ? parseFloat(value) : value
-        }),
-      })
-      const responseData = await response.json();
-      console.log('API response:', responseData);
-      if (!response.ok) {
-        throw new Error(`Failed to save entry: ${responseData.error}`);
-      }
-      console.log('Entry saved successfully');
-    } catch (error) {
-      console.error('Error saving entry:', error);
-      // You might want to show an error message to the user here
+    const entryData = {
+      month,
+      day,
+      building,
+      ...entry,
+      [field]: field === 'cost' ? parseFloat(value) : value
     }
-  }, [data])
+
+    debouncedSave(entryData)
+  }, [data, debouncedSave])
 
   const addEntry = useCallback(async (month: string, day: number, building: string) => {
     setData((prevData: { [month: string]: MonthData }) => {
@@ -94,8 +129,8 @@ export default function SpreadsheetApp() {
       return newData
     })
 
-    // Save to database
     try {
+      setSaveStatus('saving')
       const response = await fetch('/api/saveEntry', {
         method: 'POST',
         headers: {
@@ -113,9 +148,10 @@ export default function SpreadsheetApp() {
       if (!response.ok) {
         throw new Error('Failed to save entry')
       }
+      setSaveStatus('saved')
     } catch (error) {
       console.error('Error saving entry:', error)
-      // You might want to show an error message to the user here
+      setSaveStatus('error')
     }
   }, [])
 
@@ -134,6 +170,9 @@ export default function SpreadsheetApp() {
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Building Management Spreadsheet</h1>
+      {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
+      {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
+      {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}
       <Tabs value={selectedMonth} onValueChange={setSelectedMonth} className="mb-6">
         <TabsList className="flex flex-wrap gap-2 mb-4">
           {months.map(month => (

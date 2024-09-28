@@ -1,5 +1,9 @@
-import { sql } from '@vercel/postgres';
 import { NextApiRequest, NextApiResponse } from 'next';
+import Airtable from 'airtable';
+
+// Configure Airtable
+const base = new Airtable({apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN}).base(process.env.AIRTABLE_BASE_ID!);
+const table = base(process.env.AIRTABLE_TABLE_NAME!);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('API route called', req.method, req.body);
@@ -8,11 +12,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       console.log('Attempting to insert:', { month, day, building, employee, description, cost });
-      const result = await sql`
-        INSERT INTO entries (month, day, building, employee, description, cost)
-        VALUES (${month}, ${day}, ${building}, ${employee}, ${description}, ${cost})
-        RETURNING *
-      `;
+      const result = await table.create([
+        {
+          fields: {
+            month,
+            day,
+            building,
+            employee,
+            description,
+            cost
+          }
+        }
+      ]);
       console.log('Entry saved successfully, returned data:', result);
       res.status(200).json({ message: 'Entry saved successfully', data: result });
     } catch (error: unknown) {
