@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "vercel-build": "pnpm install --no-frozen-lockfile && pnpm run build"
+    "lint": "next lint"
   },
   "dependencies": {
     "@radix-ui/react-select": "^1.2.2",
@@ -37,6 +36,6 @@
   },
   "engines": {
     "node": ">=18.17.0",
-    "pnpm": ">=7.0.0"
+    "pnpm": ">=6.0.0"  // Changed from 7.0.0 to 6.0.0
   }
 }

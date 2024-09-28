@@ -1,0 +1,12 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "installCommand": "npx pnpm@latest install --no-frozen-lockfile",
+        "buildCommand": "npx pnpm@latest run build"
+      }
+    }
+  ]
+}
