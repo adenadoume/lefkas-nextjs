@@ -123,41 +123,45 @@ export default function SpreadsheetApp() {
   }, [data, debouncedSave])
 
   const addEntry = useCallback(async (month: string, day: number, building: string) => {
+    const newEntry = {
+      id: Date.now().toString(),
+      month,
+      day,
+      building,
+      employee: '',
+      description: '',
+      cost: 0
+    };
+
     setData((prevData: { [month: string]: MonthData }) => {
-      const newData = { ...prevData }
-      if (!newData[month]) newData[month] = {}
-      if (!newData[month][day]) newData[month][day] = {}
-      if (!newData[month][day][building]) newData[month][day][building] = []
-      newData[month][day][building].push({ id: Date.now().toString(), employee: '', description: '', cost: 0 })
-      return newData
-    })
+      const newData = { ...prevData };
+      if (!newData[month]) newData[month] = {};
+      if (!newData[month][day]) newData[month][day] = {};
+      if (!newData[month][day][building]) newData[month][day][building] = [];
+      newData[month][day][building].push(newEntry);
+      return newData;
+    });
 
     try {
-      setSaveStatus('saving')
+      setSaveStatus('saving');
       const response = await fetch('/api/saveEntry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          id: Date.now().toString(),
-          month,
-          day,
-          building,
-          employee: '',
-          description: '',
-          cost: 0
-        }),
-      })
+        body: JSON.stringify(newEntry),
+      });
       if (!response.ok) {
-        throw new Error('Failed to save entry')
+        throw new Error('Failed to save entry');
       }
-      setSaveStatus('saved')
+      const result = await response.json();
+      console.log('New entry saved:', result);
+      setSaveStatus('saved');
     } catch (error) {
-      console.error('Error saving entry:', error)
-      setSaveStatus('error')
+      console.error('Error saving new entry:', error);
+      setSaveStatus('error');
     }
-  }, [])
+  }, []);
 
   const calculateDailyTotal = (month: string, day: number, building: string): number => {
     return data[month]?.[day]?.[building]?.reduce((sum: number, entry: Entry) => sum + (entry.cost || 0), 0) || 0
