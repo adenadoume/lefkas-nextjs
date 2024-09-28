@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "vercel-build": "pnpm install --no-frozen-lockfile && pnpm run build"
   },
   "dependencies": {
     "@radix-ui/react-select": "^1.2.2",
