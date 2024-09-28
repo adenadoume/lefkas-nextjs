@@ -14,9 +14,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       `;
       console.log('Entry saved successfully');
       res.status(200).json({ message: 'Entry saved successfully' });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving entry:', error);
-      res.status(500).json({ error: 'Failed to save entry', details: error.message });
+      if (error instanceof Error) {
+        res.status(500).json({ error: 'Failed to save entry', details: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to save entry', details: 'An unknown error occurred' });
+      }
     }
   } else {
     res.setHeader('Allow', ['POST']);
