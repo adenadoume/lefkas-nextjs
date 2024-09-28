@@ -58,6 +58,7 @@ export default function SpreadsheetApp() {
     // Save to database
     const entry = data[month]?.[day]?.[building]?.[index] || { employee: '', description: '', cost: 0 }
     try {
+      console.log('Sending entry to API:', { month, day, building, ...entry, [field]: field === 'cost' ? parseFloat(value) : value });
       const response = await fetch('/api/saveEntry', {
         method: 'POST',
         headers: {
@@ -71,11 +72,14 @@ export default function SpreadsheetApp() {
           [field]: field === 'cost' ? parseFloat(value) : value
         }),
       })
+      const responseData = await response.json();
+      console.log('API response:', responseData);
       if (!response.ok) {
-        throw new Error('Failed to save entry')
+        throw new Error(`Failed to save entry: ${responseData.error}`);
       }
+      console.log('Entry saved successfully');
     } catch (error) {
-      console.error('Error saving entry:', error)
+      console.error('Error saving entry:', error);
       // You might want to show an error message to the user here
     }
   }, [data])

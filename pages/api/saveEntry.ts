@@ -8,12 +8,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       console.log('Attempting to insert:', { month, day, building, employee, description, cost });
-      await sql`
+      const result = await sql`
         INSERT INTO entries (month, day, building, employee, description, cost)
         VALUES (${month}, ${day}, ${building}, ${employee}, ${description}, ${cost})
+        RETURNING *
       `;
-      console.log('Entry saved successfully');
-      res.status(200).json({ message: 'Entry saved successfully' });
+      console.log('Entry saved successfully, returned data:', result);
+      res.status(200).json({ message: 'Entry saved successfully', data: result });
     } catch (error: unknown) {
       console.error('Error saving entry:', error);
       if (error instanceof Error) {
