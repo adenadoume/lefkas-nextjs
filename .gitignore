@@ -37,3 +37,5 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# Make sure pnpm-lock.yaml is not in this list
