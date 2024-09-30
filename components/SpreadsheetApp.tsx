@@ -245,12 +245,14 @@ export default function SpreadsheetApp() {
           <TabsContent key={month} value={month}>
             <div className="mb-4">
               <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
-                <SelectTrigger className="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                <SelectTrigger className="w-full p-2 border border-gray-300 rounded bg-black text-white">
                   <SelectValue placeholder="Select building" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-100 z-10">
+                <SelectContent className="bg-black text-white z-10">
                   {buildings.map(building => (
-                    <SelectItem key={building} value={building}>{building}</SelectItem>
+                    <SelectItem key={building} value={building} className="hover:bg-gray-800">
+                      {building}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

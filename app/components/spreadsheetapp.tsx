@@ -24,7 +24,7 @@ export function SpreadsheetApp() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 font-geist-sans">
       {/* ... existing JSX */}
       <div className="mt-4 flex justify-end">
         <button

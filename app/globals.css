@@ -17,3 +17,9 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+@import '@geist-ui/font/dist/geist-sans/style.css';
+
+body {
+  font-family: 'Geist Sans', sans-serif;
+}
