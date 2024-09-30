@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Spreadsheet } from './Spreadsheet';
+// Remove or comment out the following line:
+// import { Spreadsheet } from './Spreadsheet';
 // ... other imports
 
 export function SpreadsheetApp() {
