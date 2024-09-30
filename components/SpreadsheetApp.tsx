@@ -346,14 +346,7 @@ export default function SpreadsheetApp() {
           </TabsContent>
         ))}
       </Tabs>
-      <div className="mt-4 flex justify-end">
-        <button
-          onClick={() => debouncedSave(data)}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Save Changes
-        </button>
-      </div>
+      
       {showSavedMessage && (
         <div className="text-right mt-2">
           <span className="text-sm text-green-600">Changes saved</span>
