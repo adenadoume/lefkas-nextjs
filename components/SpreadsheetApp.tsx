@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { debounce } from 'lodash'
 import { Trash2 } from 'lucide-react'
 import Image from 'next/image';
+import { CSVLink } from "react-csv";
 
 const buildings = ['OIK50', 'OIK60', 'OIK90']
 const employees = ['Cleaning', 'Gardeners', 'Photographer','Pool boy', 'Niki', 'Elina', 'Ferman', 'Sidian', 'Other', '-']
@@ -245,19 +246,53 @@ export default function SpreadsheetApp() {
     };
   }, []);
 
+  const generateCSVData = useCallback(() => {
+    const csvData = [];
+    const headers = ['Building', 'Month', 'Day', 'Employee', 'Description', 'Cost (€)'];
+    csvData.push(headers);
+
+    buildings.forEach(building => {
+      months.forEach(month => {
+        let monthlyTotal = 0;
+        for (let day = 1; day <= getDaysInMonth(month); day++) {
+          const entries = data[month]?.[day]?.[building] || [];
+          if (entries.length === 0) {
+            csvData.push([building, month, day, '-', '-', '0']);
+          } else {
+            entries.forEach(entry => {
+              csvData.push([
+                building,
+                month,
+                day,
+                entry.employee,
+                entry.description,
+                entry.cost.toString()
+              ]);
+              monthlyTotal += entry.cost;
+            });
+          }
+        }
+        csvData.push([building, month, 'Monthly Total', '', '', monthlyTotal.toString()]);
+      });
+      const yearlyTotal = months.reduce((total, month) => total + calculateMonthlyTotal(month, building), 0);
+      csvData.push([building, 'Yearly Total', '', '', '', yearlyTotal.toString()]);
+      csvData.push([]); // Empty row for separation
+    });
+
+    return csvData;
+  }, [data, buildings, months, getDaysInMonth, calculateMonthlyTotal]);
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Lefkas Costs</h1>
-        <div className="flex-grow flex justify-center">
-          <Image 
-            src="/palerosbay-logo.png" 
-            alt="Paleros Bay Logo" 
-            width={150} 
-            height={99} 
-          />
-        </div>
-        <div className="w-[150px]"></div>
+        <CSVLink 
+          data={generateCSVData()} 
+          filename={"lefkas_costs.csv"}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Export CSV
+        </CSVLink>
       </div>
       <div className="text-right mb-4 h-6"> {/* Added fixed height to prevent layout shift */}
         {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
