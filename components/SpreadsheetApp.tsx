@@ -10,7 +10,7 @@ import { debounce } from 'lodash'
 import { Trash2 } from 'lucide-react'
 
 const buildings = ['OIK50', 'OIK60', 'OIK90']
-const employees = ['Elina', 'Alex', 'Ferman', 'Cleaning']
+const employees = ['Cleaning', 'Niki', 'Elina', 'Ferman', 'Sidian', 'Other', '-']
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 type Entry = {
@@ -212,8 +212,7 @@ export default function SpreadsheetApp() {
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Building Management Spreadsheet</h1>
-      <Button onClick={handleSeed} className="mb-4">Seed Data</Button>
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Lefkas Costs</h1>
       {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
       {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
       {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}
