@@ -382,21 +382,21 @@ export default function SpreadsheetApp() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-gray-800">Date</TableHead>
-                      <TableHead className="text-gray-800">Day</TableHead>
-                      <TableHead className="text-gray-800">Employee</TableHead>
-                      <TableHead className="text-gray-800">Description</TableHead>
-                      <TableHead className="text-gray-800">Cost (€)</TableHead>
-                      <TableHead className="text-gray-800">Daily Total (€)</TableHead>
-                      <TableHead className="text-gray-800">Actions</TableHead>
+                      <TableHead className="text-gray-800 w-16">Date</TableHead>
+                      <TableHead className="text-gray-800 w-16">Day</TableHead>
+                      <TableHead className="text-gray-800 w-24">Employee</TableHead>
+                      <TableHead className="text-gray-800 w-1/4">Description</TableHead>
+                      <TableHead className="text-gray-800 w-20">Cost (€)</TableHead>
+                      <TableHead className="text-gray-800 w-24">Daily Total (€)</TableHead>
+                      <TableHead className="text-gray-800 w-20">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {Array.from({ length: getDaysInMonth(month) }, (_, i) => i + 1).map(day => (
                       <TableRow key={day} className="hover:bg-gray-50 transition-colors duration-150 ease-in-out">
-                        <TableCell>{day}</TableCell>
-                        <TableCell>{getDayName(month, day)}</TableCell>
-                        <TableCell>
+                        <TableCell className="w-16">{day}</TableCell>
+                        <TableCell className="w-16">{getDayName(month, day)}</TableCell>
+                        <TableCell className="w-24">
                           {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
                             <div key={index} className="mb-2">
                               <Select
@@ -415,7 +415,7 @@ export default function SpreadsheetApp() {
                             </div>
                           ))}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-1/4">
                           {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
                             <Input
                               key={index}
@@ -425,7 +425,7 @@ export default function SpreadsheetApp() {
                             />
                           ))}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-20">
                           {data[month]?.[day]?.[selectedBuilding]?.map((entry, index) => (
                             <div key={index} className="flex items-center mb-2">
                               <Input
@@ -445,10 +445,10 @@ export default function SpreadsheetApp() {
                             </div>
                           ))}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-24">
                           {calculateDailyTotal(month, day, selectedBuilding).toFixed(0)}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-20">
                           <Button 
                             onClick={() => addEntry(month, day, selectedBuilding)} 
                             className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-150 ease-in-out text-sm"
