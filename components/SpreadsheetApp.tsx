@@ -223,6 +223,25 @@ export default function SpreadsheetApp() {
     }
   }, [data])
 
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const triggers = document.querySelectorAll('.group');
+      triggers.forEach((trigger) => {
+        const rect = trigger.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        (trigger as HTMLElement).style.setProperty('--tw-translate-x', `${x}px`);
+        (trigger as HTMLElement).style.setProperty('--tw-translate-y', `${y}px`);
+      });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Lefkas Costs</h1>
@@ -245,12 +264,22 @@ export default function SpreadsheetApp() {
           <TabsContent key={month} value={month}>
             <div className="mb-4">
               <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
-                <SelectTrigger className="w-full p-2 border border-gray-300 rounded bg-black text-white">
+                <SelectTrigger 
+                  className="w-full p-2 border border-gray-300 rounded bg-[#3b82f6] text-white 
+                             hover:bg-gradient-to-br from-[#3b82f6] to-[#2563eb] 
+                             transition-all duration-300 ease-in-out
+                             relative overflow-hidden group"
+                >
                   <SelectValue placeholder="Select building" />
+                  <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" 
+                       style={{
+                         transform: 'translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))',
+                       }}
+                  ></div>
                 </SelectTrigger>
-                <SelectContent className="bg-black text-white z-10">
+                <SelectContent className="bg-[#3b82f6] text-white z-10">
                   {buildings.map(building => (
-                    <SelectItem key={building} value={building} className="hover:bg-gray-800">
+                    <SelectItem key={building} value={building} className="hover:bg-[#2563eb]">
                       {building}
                     </SelectItem>
                   ))}
