@@ -463,17 +463,10 @@ export default function SpreadsheetApp() {
           </TabsContent>
         ))}
       </Tabs>
-      <div className="flex justify-end mt-6 space-x-4">
-        <CSVLink 
-          data={generateCSVData()} 
-          filename={"lefkas_costs.csv"}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Export CSV
-        </CSVLink>
+      <div className="flex justify-end mt-6">
         <button
           onClick={generateExcelFile}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
         >
           Export Excel Files
         </button>
