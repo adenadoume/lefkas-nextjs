@@ -33,6 +33,7 @@ export default function SpreadsheetApp() {
   const [selectedMonth, setSelectedMonth] = useState(months[new Date().getMonth()])
   const [selectedBuilding, setSelectedBuilding] = useState(buildings[0])
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [showSavedMessage, setShowSavedMessage] = useState(false);
 
   const debouncedSave = useRef(
     debounce(async (entryData) => {
@@ -51,6 +52,7 @@ export default function SpreadsheetApp() {
         }
         console.log('Entry saved successfully:', responseData)
         setSaveStatus('saved')
+        setShowSavedMessage(true);
       } catch (error) {
         console.error('Error saving entry:', error)
         setSaveStatus('error')
@@ -85,6 +87,16 @@ export default function SpreadsheetApp() {
     }
     fetchData()
   }, [])
+
+  useEffect(() => {
+    if (showSavedMessage) {
+      const timer = setTimeout(() => {
+        setShowSavedMessage(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSavedMessage]);
 
   const getDaysInMonth = (month: string): number => {
     const date = new Date(new Date().getFullYear(), months.indexOf(month) + 1, 0)
@@ -157,6 +169,7 @@ export default function SpreadsheetApp() {
       const result = await response.json();
       console.log('New entry saved:', result);
       setSaveStatus('saved');
+      setShowSavedMessage(true);
     } catch (error) {
       console.error('Error saving new entry:', error);
       setSaveStatus('error');
@@ -331,6 +344,19 @@ export default function SpreadsheetApp() {
           </TabsContent>
         ))}
       </Tabs>
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={() => debouncedSave(data)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Save Changes
+        </button>
+      </div>
+      {showSavedMessage && (
+        <div className="text-right mt-2">
+          <span className="text-sm text-green-600">Changes saved</span>
+        </div>
+      )}
     </div>
   )
 }
