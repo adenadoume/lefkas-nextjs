@@ -10,6 +10,9 @@ import { debounce } from 'lodash'
 import { Trash2 } from 'lucide-react'
 import Image from 'next/image';
 import { CSVLink } from "react-csv";
+import React from 'react';
+import * as ExcelJS from 'exceljs';
+import FileSaver from 'file-saver';
 
 const buildings = ['OIK50', 'OIK60', 'OIK90']
 const employees = ['Cleaning', 'Gardeners', 'Photographer','Pool boy', 'Niki', 'Elina', 'Ferman', 'Sidian', 'Other', '-']
@@ -282,6 +285,36 @@ export default function SpreadsheetApp() {
     return csvData;
   }, [data, buildings, months, getDaysInMonth, calculateMonthlyTotal]);
 
+  const generateExcelFile = useCallback(async () => {
+    for (const building of buildings) {
+      const workbook = new ExcelJS.Workbook();
+      
+      months.forEach(month => {
+        const worksheet = workbook.addWorksheet(month);
+        
+        worksheet.addRow(['Day', 'Employee', 'Description', 'Cost (€)']);
+        
+        let monthlyTotal = 0;
+        for (let day = 1; day <= getDaysInMonth(month); day++) {
+          const entries = data[month]?.[day]?.[building] || [];
+          if (entries.length === 0) {
+            worksheet.addRow([day, '-', '-', 0]);
+          } else {
+            entries.forEach(entry => {
+              worksheet.addRow([day, entry.employee, entry.description, entry.cost]);
+              monthlyTotal += entry.cost;
+            });
+          }
+        }
+        worksheet.addRow(['Monthly Total', '', '', monthlyTotal]);
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      FileSaver.saveAs(blob, `lefkas_costs_${building}.xlsx`);
+    }
+  }, [data, buildings, months, getDaysInMonth]);
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
       <div className="flex items-center justify-between mb-6">
@@ -430,7 +463,7 @@ export default function SpreadsheetApp() {
           </TabsContent>
         ))}
       </Tabs>
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-end mt-6 space-x-4">
         <CSVLink 
           data={generateCSVData()} 
           filename={"lefkas_costs.csv"}
@@ -438,6 +471,12 @@ export default function SpreadsheetApp() {
         >
           Export CSV
         </CSVLink>
+        <button
+          onClick={generateExcelFile}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Export Excel Files
+        </button>
       </div>
     </div>
   )
