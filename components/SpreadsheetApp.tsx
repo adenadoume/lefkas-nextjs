@@ -270,7 +270,9 @@ export default function SpreadsheetApp() {
                              transition-all duration-300 ease-in-out
                              relative overflow-hidden group"
                 >
-                  <SelectValue placeholder="Select building" />
+                  <span className="relative z-10">
+                    <SelectValue placeholder="Select building" />
+                  </span>
                   <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" 
                        style={{
                          transform: 'translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))',
@@ -279,7 +281,7 @@ export default function SpreadsheetApp() {
                 </SelectTrigger>
                 <SelectContent className="bg-[#3b82f6] text-white z-10">
                   {buildings.map(building => (
-                    <SelectItem key={building} value={building} className="hover:bg-[#2563eb]">
+                    <SelectItem key={building} value={building} className="hover:bg-[#2563eb] text-white">
                       {building}
                     </SelectItem>
                   ))}
