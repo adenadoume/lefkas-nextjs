@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { debounce } from 'lodash'
 import { Trash2 } from 'lucide-react'
+import Image from 'next/image';
 
 const buildings = ['OIK50', 'OIK60', 'OIK90']
 const employees = ['Cleaning', 'Niki', 'Elina', 'Ferman', 'Sidian', 'Other', '-']
@@ -244,7 +245,18 @@ export default function SpreadsheetApp() {
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Lefkas Costs</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Lefkas Costs</h1>
+        <div className="flex-grow flex justify-center">
+          <Image 
+            src="/palerosbay-logo.jpg" 
+            alt="Paleros Bay Logo" 
+            width={150} 
+            height={99} 
+          />
+        </div>
+        <div className="w-[150px]"></div> {/* Adjusted to match new logo width */}
+      </div>
       {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
       {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
       {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}
