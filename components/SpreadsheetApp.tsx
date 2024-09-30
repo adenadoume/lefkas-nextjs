@@ -224,7 +224,7 @@ export default function SpreadsheetApp() {
   }, [data])
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto">
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Lefkas Costs</h1>
       {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
       {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
@@ -245,10 +245,10 @@ export default function SpreadsheetApp() {
           <TabsContent key={month} value={month}>
             <div className="mb-4">
               <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
-                <SelectTrigger className="w-full p-2 border border-gray-300 rounded bg-white">
+                <SelectTrigger className="w-full p-2 border border-gray-300 rounded bg-gray-100">
                   <SelectValue placeholder="Select building" />
                 </SelectTrigger>
-                <SelectContent className="bg-white z-10">
+                <SelectContent className="bg-gray-100 z-10">
                   {buildings.map(building => (
                     <SelectItem key={building} value={building}>{building}</SelectItem>
                   ))}
