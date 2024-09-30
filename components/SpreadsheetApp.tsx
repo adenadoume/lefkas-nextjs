@@ -34,7 +34,21 @@ export default function SpreadsheetApp() {
   const [selectedMonth, setSelectedMonth] = useState(months[new Date().getMonth()])
   const [selectedBuilding, setSelectedBuilding] = useState(buildings[0])
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [showSavedMessage, setShowSavedMessage] = useState(false);
+  const saveStatusTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (saveStatus === 'saved' || saveStatus === 'error') {
+      saveStatusTimeoutRef.current = setTimeout(() => {
+        setSaveStatus('idle')
+      }, 3000)
+    }
+
+    return () => {
+      if (saveStatusTimeoutRef.current) {
+        clearTimeout(saveStatusTimeoutRef.current)
+      }
+    }
+  }, [saveStatus])
 
   const debouncedSave = useRef(
     debounce(async (entryData) => {
@@ -53,7 +67,6 @@ export default function SpreadsheetApp() {
         }
         console.log('Entry saved successfully:', responseData)
         setSaveStatus('saved')
-        setShowSavedMessage(true);
       } catch (error) {
         console.error('Error saving entry:', error)
         setSaveStatus('error')
@@ -88,16 +101,6 @@ export default function SpreadsheetApp() {
     }
     fetchData()
   }, [])
-
-  useEffect(() => {
-    if (showSavedMessage) {
-      const timer = setTimeout(() => {
-        setShowSavedMessage(false);
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [showSavedMessage]);
 
   const getDaysInMonth = (month: string): number => {
     const date = new Date(new Date().getFullYear(), months.indexOf(month) + 1, 0)
@@ -170,7 +173,6 @@ export default function SpreadsheetApp() {
       const result = await response.json();
       console.log('New entry saved:', result);
       setSaveStatus('saved');
-      setShowSavedMessage(true);
     } catch (error) {
       console.error('Error saving new entry:', error);
       setSaveStatus('error');
@@ -249,17 +251,19 @@ export default function SpreadsheetApp() {
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Lefkas Costs</h1>
         <div className="flex-grow flex justify-center">
           <Image 
-            src="/palerosbay-logo.jpg" 
+            src="/palerosbay-logo.png" 
             alt="Paleros Bay Logo" 
             width={150} 
             height={99} 
           />
         </div>
-        <div className="w-[150px]"></div> {/* Adjusted to match new logo width */}
+        <div className="w-[150px]"></div>
       </div>
-      {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
-      {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
-      {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}
+      <div className="text-right mb-4 h-6"> {/* Added fixed height to prevent layout shift */}
+        {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
+        {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
+        {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}
+      </div>
       <Tabs value={selectedMonth} onValueChange={setSelectedMonth} className="mb-6">
         <TabsList className="flex flex-wrap gap-2 mb-4">
           {months.map(month => (
@@ -389,12 +393,6 @@ export default function SpreadsheetApp() {
           </TabsContent>
         ))}
       </Tabs>
-      
-      {showSavedMessage && (
-        <div className="text-right mt-2">
-          <span className="text-sm text-green-600">Changes saved</span>
-        </div>
-      )}
     </div>
   )
 }
