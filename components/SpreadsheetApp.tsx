@@ -284,17 +284,19 @@ export default function SpreadsheetApp() {
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Lefkas Costs</h1>
-        <CSVLink 
-          data={generateCSVData()} 
-          filename={"lefkas_costs.csv"}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Export CSV
-        </CSVLink>
+        <div className="flex-grow flex justify-center">
+          <Image 
+            src="/palerosbay-logo.svg" 
+            alt="Paleros Bay Logo" 
+            width={150} 
+            height={99} 
+          />
+        </div>
+        <div className="w-[150px]"></div>
       </div>
-      <div className="text-right mb-4 h-6"> {/* Added fixed height to prevent layout shift */}
+      <div className="text-right mb-4 h-6">
         {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
         {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
         {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}
@@ -428,6 +430,15 @@ export default function SpreadsheetApp() {
           </TabsContent>
         ))}
       </Tabs>
+      <div className="flex justify-end mt-6">
+        <CSVLink 
+          data={generateCSVData()} 
+          filename={"lefkas_costs.csv"}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Export CSV
+        </CSVLink>
+      </div>
     </div>
   )
 }
