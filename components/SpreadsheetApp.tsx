@@ -316,9 +316,9 @@ export default function SpreadsheetApp() {
   }, [data, buildings, months, getDaysInMonth]);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
+    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden p-4 md:p-8 max-w-7xl mx-auto font-geist-sans">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Lefkas Costs</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Lefkas Costs</h1>
         <div className="flex-grow flex justify-center">
           <Image 
             src="/palerosbay-logo.svg" 
@@ -330,9 +330,9 @@ export default function SpreadsheetApp() {
         <div className="w-[150px]"></div>
       </div>
       <div className="text-right mb-4 h-6">
-        {saveStatus === 'saving' && <p className="text-blue-500">Saving...</p>}
-        {saveStatus === 'saved' && <p className="text-green-500">Changes saved</p>}
-        {saveStatus === 'error' && <p className="text-red-500">Error saving changes</p>}
+        {saveStatus === 'saving' && <p className="text-blue-500 dark:text-blue-400">Saving...</p>}
+        {saveStatus === 'saved' && <p className="text-green-500 dark:text-green-400">Changes saved</p>}
+        {saveStatus === 'error' && <p className="text-red-500 dark:text-red-400">Error saving changes</p>}
       </div>
       <div className="mb-6">
         <div className="mb-4">
