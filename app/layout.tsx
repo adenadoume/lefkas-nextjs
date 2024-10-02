@@ -18,8 +18,8 @@ export default function RootLayout({
       <body className={`${fontSans.variable} font-sans`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <div className="flex justify-end p-4">
